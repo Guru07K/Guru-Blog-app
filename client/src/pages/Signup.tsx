@@ -1,7 +1,58 @@
-import { Button, Label, TextInput } from 'flowbite-react';
-import { Link } from 'react-router-dom';
+import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Signup() {
+  type SignUpForm = {
+    user_name: string;
+    email: string;
+    password: string;
+  };
+  const [formData, setFormData] = useState<SignUpForm>({
+    user_name: '',
+    email: '',
+    password: '',
+  });
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [responseMessage, setResponseMessage] = useState<string>('');
+
+  const navigate = useNavigate();
+
+  const onChangeListener = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value.trim() });
+  };
+
+  const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setErrorMessage('');
+    setResponseMessage('');
+
+    try {
+      setIsLoading(true);
+      const res: Response = await fetch('/app/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setResponseMessage(data.message);
+        // navigate('/signin');
+        return;
+      }
+
+      setErrorMessage(data.message);
+      setIsLoading(false);
+    } catch (error: any) {
+      if (error instanceof Error) setErrorMessage(error.message);
+      else setErrorMessage(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       <div className="min-h-screen mt-20">
@@ -19,23 +70,31 @@ export default function Signup() {
 
           {/* right */}
           <div className="flex-1">
-            <form className="flex flex-col gap-4">
+            <form className="flex flex-col gap-4" onSubmit={onSubmitHandler}>
               <div>
                 <Label>UserName</Label>
-                <TextInput type="text" placeholder="UserName" id="user_name" />
+                <TextInput type="text" placeholder="UserName" name="user_name" onChange={onChangeListener} />
               </div>
               <div>
                 <Label>Email</Label>
-                <TextInput type="email" placeholder="name@company.in" id="email" />
+                <TextInput type="email" placeholder="name@company.in" name="email" onChange={onChangeListener} />
               </div>
               <div>
                 <Label>Password</Label>
-                <TextInput type="password" placeholder="password" id="password" />
+                <TextInput type="password" placeholder="password" name="password" onChange={onChangeListener} />
               </div>
               <Button
                 type="submit"
-                className="bg-linear-to-r from-purple-500 to-pink-500 cursor-pointer hover:scale-103 transition-transform duration-200">
-                Sign up
+                className="bg-linear-to-r from-purple-500 to-pink-500 cursor-pointer hover:scale-105 transition-transform duration-200"
+                disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Spinner size="sm" />
+                    <span>Loading...</span>
+                  </>
+                ) : (
+                  'Sign up'
+                )}
               </Button>
             </form>
 
@@ -46,6 +105,22 @@ export default function Signup() {
                 Sign In
               </Link>
             </div>
+
+            {(errorMessage && (
+              <>
+                <Alert className="mt-5" color="failure">
+                  {errorMessage}
+                </Alert>
+              </>
+            )) ||
+              (responseMessage && (
+                <>
+                  <Alert className="mt-5" color="success">
+                    {' '}
+                    {responseMessage}
+                  </Alert>
+                </>
+              ))}
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import DashBoard from './pages/DashBoard';
 import Contact from './pages/Contact';
 import About from './pages/About';
 import Signup from './pages/Signup';
+import FooterComponent from './components/Footer';
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/signup" element={<Signup />} />
       </Routes>
+      <FooterComponent />
     </BrowserRouter>
   );
 }
