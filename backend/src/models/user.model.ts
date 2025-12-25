@@ -15,7 +15,6 @@ export class UserSignUpRequest {
 }
 
 export class UserSignInRequest {
-  login_method: LoginMethod;
   email: string;
   password: string;
 }

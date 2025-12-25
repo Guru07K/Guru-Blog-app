@@ -8,7 +8,7 @@ export class Utils {
     } else if (typeof value === 'object') {
       return Object.keys(value).length === 0;
     } else if (typeof value === 'boolean') {
-      return false;
+      return value ? false : true;
     }
   }
 

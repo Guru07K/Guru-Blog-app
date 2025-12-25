@@ -25,9 +25,9 @@ export default function Header() {
           <FaMoon />
         </Button>
 
-        <Link to="/signin">
+        <Link to="/signup">
           <Button className="bg-linear-to-r from-purple-500 to-blue-500 cursor-pointer" pill>
-            Sign In
+            Sign Up
           </Button>
         </Link>
         <NavbarToggle />

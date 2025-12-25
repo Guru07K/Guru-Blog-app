@@ -2,24 +2,21 @@ import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../redux/store/hooks';
-import { clearMessage, FailedAction, initProcess, SignUpSuccess } from '../redux/slice/User.slice';
+import { clearMessage, FailedAction, initProcess, signInSuccess } from '../redux/slice/User.slice';
 import toast from 'react-hot-toast';
 
-export default function SignUp() {
+export default function SignIn() {
   type SignUpForm = {
-    user_name: string;
     email: string;
     password: string;
   };
   const [formData, setFormData] = useState<SignUpForm>({
-    user_name: '',
     email: '',
     password: '',
   });
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
   const { user, error: errorMessage, loading: isLoading, message: successMessage } = useAppSelector((state) => state.user);
 
   const onChangeListener = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,7 +28,7 @@ export default function SignUp() {
 
     try {
       dispatch(initProcess());
-      const res: Response = await fetch('/app/auth/signup', {
+      const res: Response = await fetch('/app/auth/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -39,14 +36,13 @@ export default function SignUp() {
 
       const data = await res.json();
       if (res.ok) {
-        dispatch(SignUpSuccess(data));
-        navigate('/signin');
+        dispatch(signInSuccess(data));
+        navigate('/');
         return;
       }
       dispatch(FailedAction(data.message));
     } catch (error: any) {
       dispatch(FailedAction(error.message));
-      toast.error(errorMessage);
     }
   };
 
@@ -80,10 +76,6 @@ export default function SignUp() {
           <div className="flex-1">
             <form className="flex flex-col gap-4" onSubmit={onSubmitHandler}>
               <div>
-                <Label>UserName</Label>
-                <TextInput type="text" placeholder="UserName" name="user_name" onChange={onChangeListener} />
-              </div>
-              <div>
                 <Label>Email</Label>
                 <TextInput type="email" placeholder="name@company.in" name="email" onChange={onChangeListener} />
               </div>
@@ -101,18 +93,26 @@ export default function SignUp() {
                     <span>Loading...</span>
                   </>
                 ) : (
-                  'Sign up'
+                  'Sign In'
                 )}
               </Button>
             </form>
 
             {/* Have an acoount */}
             <div className="flex gap-2 mt-5 text-sm">
-              <span>Have an account?</span>
-              <Link to="/signin" className="text-blue-600">
-                Sign In
+              <span>Dont Have an account?</span>
+              <Link to="/signup" className="text-blue-600">
+                Sign Up
               </Link>
             </div>
+
+            {errorMessage && (
+              <>
+                <Alert className="mt-5" color="failure">
+                  {errorMessage}
+                </Alert>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -10,13 +10,13 @@ const userSchema = new mongoose.Schema<IUser>(
     email: {
       type: String,
       required: true,
-      unique: true,
+      unique: [true, 'Duplicate email found'],
     },
     password: {
       type: String,
       required: true,
       select: false,
-      minlength: 8,
+      minlength: [8, 'Password must be above 8 character'],
     },
   },
   { timestamps: true }
